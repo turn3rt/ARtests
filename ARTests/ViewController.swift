@@ -15,6 +15,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBOutlet var sceneView: ARSCNView!
     // Create a session configuration
     let configuration = ARWorldTrackingConfiguration()
+    let scene = SCNScene()
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,13 +32,22 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
+        sceneView.autoenablesDefaultLighting = true
         sceneView.debugOptions = [SCNDebugOptions.showWorldOrigin, SCNDebugOptions.showFeaturePoints] //, .showWireframe]
         
-        let scene = SCNScene()
         sceneView.scene = scene
-        let startPoint = SCNVector3(0,0,-3)
+        let startPoint = SCNVector3(0,0,0)
         let originPoint = createNode(at: startPoint)
         scene.rootNode.addChildNode(originPoint)
+        
+        for i in 1...10 {
+            createNodeRow(x: 0, y: 2*nodeRadius*Double(i))
+        }
+        
+        
+       
+        
+        
         
         
     }
@@ -55,16 +66,26 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         print("User Reset World Origin")
     }
     
-    // MARK: Internal Functions
+    // MARK: Internal Functions and vars
+    let nodeRadius = 0.008
     func createNode(at position: SCNVector3) -> SCNNode {
-        let sphere = SCNSphere(radius: 0.4)
+        let sphere = SCNSphere(radius: CGFloat(nodeRadius))
         let node = SCNNode(geometry: sphere)
         node.position = position
         
-//        let material = SCNMaterial()
-//        material.diffuse.contents = UIColor.red
-//        node.geometry?.firstMaterial?.specular.contents = UIColor.white
+        let material = SCNMaterial()
+        material.diffuse.contents = UIColor.red
+        node.geometry?.firstMaterial?.diffuse.contents = UIColor.white
+        node.geometry?.firstMaterial = material
         return node
+    }
+    
+    func createNodeRow(x: Double, y: Double) {
+        for i in 0...25 {
+        let nextNodeVector = SCNVector3(x,y, -(4*nodeRadius*Double(i)))
+        let nextPoint = createNode(at: nextNodeVector)
+        scene.rootNode.addChildNode(nextPoint)
+        }
     }
     
     
